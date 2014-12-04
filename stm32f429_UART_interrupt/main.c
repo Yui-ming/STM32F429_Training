@@ -28,6 +28,15 @@ void GPIO_Configuration(void)
     /* Connect USART pins to AF */
     GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_USART1);   // USART1_TX
     GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_USART1);  // USART1_RX
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_OD ;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+
 }
  
 /**************************************************************************************/
@@ -52,6 +61,34 @@ void LED3_Toggle(void){
 
 
   GPIOG->ODR ^= GPIO_Pin_13;
+
+}
+void LED4_Toggle(void){
+
+
+  GPIOG->ODR ^= GPIO_Pin_14;
+
+}
+void LED3_On(void){
+
+  GPIO_SetBits(GPIOG,GPIO_Pin_13);
+
+}
+
+void LED3_Off(void){
+
+  GPIO_ResetBits(GPIOG,GPIO_Pin_13);
+
+}
+void LED4_On(void){
+
+  GPIO_SetBits(GPIOG,GPIO_Pin_14);
+
+}
+
+void LED4_Off(void){
+
+  GPIO_ResetBits(GPIOG,GPIO_Pin_14);
 
 }
 
@@ -93,6 +130,11 @@ void USART1_Configuration(void)
 
 }
 
+uint8_t PushButton_Read(void){
+
+    return GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0);
+  }
+
 void USART1_puts(char* s)
 {
     while(*s) {
@@ -101,7 +143,11 @@ void USART1_puts(char* s)
         s++;
     }
 }
-
+char input  ;
+char check_key[5];
+extern int interrupt_check;
+int t3=0;
+int t4=0;
 /**************************************************************************************/
 int main(void)
 {
@@ -113,14 +159,59 @@ int main(void)
     USART1_puts("Just for STM32F429I Discovery verify USART1 with USB TTL Cable\r\n");
     while(1)
     {
+    
+     /*if (t=='a')
+      {
+        LED4_On();
+      }
+      else if(t=='b')
+     {
+        LED3_On();
+      }*/
+          if(check_key[0]=='a' && check_key[1]=='b' && check_key[2]=='c' && check_key[3]=='3' && check_key[4]=='o')
+        {
+          LED3_On();
+          t3=0;
+        }
+          if(check_key[0]=='a' && check_key[1]=='b' && check_key[2]=='c' && check_key[3]=='3' && check_key[4]=='f')
+        {LED3_Off();
+          t3=0;
+        }
+        if(check_key[0]=='a' && check_key[1]=='b' && check_key[2]=='c' && check_key[3]=='4' && check_key[4]=='o')
+        {LED4_On();
+          t4=0;
+        }
+        if(check_key[0]=='a' && check_key[1]=='b' && check_key[2]=='c' && check_key[3]=='4' && check_key[4]=='f')
+        {LED4_Off();
+          t4=0;
+        }
+
+
+        if(check_key[0]=='d' && check_key[1]=='e' && check_key[2]=='f' && check_key[3]=='3' )
+        {t3=1;
+
+        }
+        if(check_key[0]=='d' && check_key[1]=='e' && check_key[2]=='f' && check_key[3]=='4')
+        {t4=1;
+        }
+       if(t3==1)
+       {
         LED3_Toggle();
-
-        Delay_1us(10000);
-
-
+          interrupt_check=0;
+          Delay_1us(100000);
+       }
+      if(t4==1)
+        {LED4_Toggle();
+          interrupt_check=0;
+          Delay_1us(100000);
+        }
+      
+        Delay_1us(100000);
+       
     }
 
 }
+
 
 
 void USART1_IRQHandler(void)
@@ -128,9 +219,20 @@ void USART1_IRQHandler(void)
   
   if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) {
     uart1_data = USART_ReceiveData(USART1);
-
     USART_SendData(USART1, uart1_data);
+    
+    input=USART_ReceiveData(USART1);
+    interrupt_check=1;
+    check_key[0]=check_key[1];
+    check_key[1]=check_key[2];
+    check_key[2]=check_key[3];
+    check_key[3]=check_key[4];
+    check_key[4]=input;
+
+
+
 
   }
 
 }
+
