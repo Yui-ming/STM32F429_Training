@@ -15,7 +15,20 @@ void RCC_Configuration(void)
       /* GPIOA clock enable */
       RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 }
- 
+ void GPIO_Configuration(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+    /*-------------------------- GPIO Configuration ----------------------------*/
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 ;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+    
+}
  
 /**************************************************************************************/
  
@@ -53,8 +66,8 @@ void Timer4_Initialization(void)
   /* -- Timer Configuration --------------------------------------------------- */
   TIM_DeInit(TIM4);
   TIM_TimeBaseInitTypeDef TIM_TimeBaseStruct;
-  TIM_TimeBaseStruct.TIM_Period = 20000 - 1 ;  //250ms  --> 4Hz
-  TIM_TimeBaseStruct.TIM_Prescaler = 9 - 1; // Prescaled by 1800 -> = 0.1M(10us)
+  TIM_TimeBaseStruct.TIM_Period = 1500 - 1 ;  //250ms  --> 4Hz
+  TIM_TimeBaseStruct.TIM_Prescaler = 90 - 1; // Prescaled by 1800 -> = 0.1M(10us)
   TIM_TimeBaseStruct.TIM_ClockDivision = TIM_CKD_DIV1; // Div by one -> 90 MHz (Now RCC_DCKCFGR_TIMPRE is configured to divide clock by two)
   TIM_TimeBaseStruct.TIM_CounterMode = TIM_CounterMode_Down;
 
@@ -81,8 +94,8 @@ void Timer5_Initialization(void)
   /* -- Timer Configuration --------------------------------------------------- */
   TIM_DeInit(TIM5);
   TIM_TimeBaseInitTypeDef TIM_TimeBaseStruct;
-  TIM_TimeBaseStruct.TIM_Period = 25000 - 1 ;  //250ms  --> 4Hz
-  TIM_TimeBaseStruct.TIM_Prescaler = 9 - 1; // Prescaled by 90 -> = 0.1M(10us)
+  TIM_TimeBaseStruct.TIM_Period = 5000 - 1 ;  //250ms  --> 4Hz
+  TIM_TimeBaseStruct.TIM_Prescaler = 360 - 1; // Prescaled by 90 -> = 0.1M(10us)
   TIM_TimeBaseStruct.TIM_ClockDivision = TIM_CKD_DIV1; // Div by one -> 90 MHz (Now RCC_DCKCFGR_TIMPRE is configured to divide clock by two)
   TIM_TimeBaseStruct.TIM_CounterMode = TIM_CounterMode_Up;
 
@@ -130,13 +143,27 @@ void LED4_Toggle(void){
 
 }
 
+void GPIO9_On(void){
+
+  GPIO_SetBits(GPIOA,GPIO_Pin_9);
+
+}
+
+void GPIO9_Off(void){
+
+  GPIO_ResetBits(GPIOA,GPIO_Pin_9);
+
+}
+
 /**************************************************************************************/
 int main(void)
 {
     RCC_Configuration();
+    GPIO_Configuration();
     LED_Initialization();
     Timer4_Initialization();
     Timer5_Initialization();
+
     while(1)
     {
         // this loop is doing nothing but smiling at you :)
@@ -149,37 +176,37 @@ void TIM4_IRQHandler()
 {
         if (TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET){
            LED4_Off();
-
+          GPIO9_Off();
             TIM_Cmd(TIM4, DISABLE);
 
         TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
         }
 }
 
-uint16_t HighTime=20000; //control high time
+uint16_t HighTime=1500; //control high time
 uint8_t Direction=0;     // control direction of amplitude change
 void TIM5_IRQHandler()
 {
         if (TIM_GetITStatus(TIM5, TIM_IT_Update) != RESET){
            
            LED4_On();
+          GPIO9_On();
+          //  if(Direction == 0){
 
-           if(Direction == 0){
+          //        HighTime -= 100;
 
-                 HighTime -= 100;
+          //        if(HighTime < 300){
+          //         Direction =1;
+          //        }
+          // }else if(Direction == 1){
 
-                 if(HighTime < 300){
-                  Direction =1;
-                 }
-          }else if(Direction == 1){
-
-                 HighTime += 100;
-                 if(HighTime > 23000){
-                  Direction =0;
-                 }
+          //        HighTime += 100;
+          //        if(HighTime > 23000){
+          //         Direction =0;
+          //        }
 
 
-          }
+          // }
 
            TIM_SetCounter(TIM4, HighTime);
             TIM_Cmd(TIM4, ENABLE);

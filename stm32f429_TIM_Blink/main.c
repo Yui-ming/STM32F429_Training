@@ -52,8 +52,8 @@ void Timer5_Initialization(void)
   /* -- Timer Configuration --------------------------------------------------- */
   TIM_DeInit(TIM5);
   TIM_TimeBaseInitTypeDef TIM_TimeBaseStruct;
-  TIM_TimeBaseStruct.TIM_Period = 25000 - 1 ;  //250ms  --> 4Hz
-  TIM_TimeBaseStruct.TIM_Prescaler = 900 - 1; // Prescaled by 900 -> = 0.1M(10us)
+  TIM_TimeBaseStruct.TIM_Period = 700 - 1 ;  //250ms  --> 4Hz
+  TIM_TimeBaseStruct.TIM_Prescaler = 99 - 1; // Prescaled by 900 -> = 0.1M(10us)
   TIM_TimeBaseStruct.TIM_ClockDivision = TIM_CKD_DIV1; // Div by one -> 90 MHz (Now RCC_DCKCFGR_TIMPRE is configured to divide clock by two)
   TIM_TimeBaseStruct.TIM_CounterMode = TIM_CounterMode_Up;
 
@@ -86,6 +86,10 @@ int main(void)
     Timer5_Initialization();
     while(1)
     {
+
+        LED3_Toggle();
+        Delay_1us(769);
+      
         // this loop is doing nothing but smiling at you :)
     }
 }
