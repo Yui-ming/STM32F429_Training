@@ -206,6 +206,7 @@ int main(void)
           Delay_1us(100000);
         }
       
+
         Delay_1us(100000);
        
     }
@@ -219,8 +220,8 @@ void USART1_IRQHandler(void)
   
   if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) {
     uart1_data = USART_ReceiveData(USART1);
+
     USART_SendData(USART1, uart1_data);
-    
     input=USART_ReceiveData(USART1);
     interrupt_check=1;
     check_key[0]=check_key[1];

@@ -183,7 +183,7 @@ void TIM4_IRQHandler()
         }
 }
 
-uint16_t HighTime=1500; //control high time
+uint16_t HighTime=1500; //control high time (TIM_Period=ARR)
 uint8_t Direction=0;     // control direction of amplitude change
 void TIM5_IRQHandler()
 {
@@ -191,22 +191,22 @@ void TIM5_IRQHandler()
            
            LED4_On();
           GPIO9_On();
-          //  if(Direction == 0){
+            if(Direction == 0){
 
-          //        HighTime -= 100;
+                  HighTime -= 100;
 
-          //        if(HighTime < 300){
-          //         Direction =1;
-          //        }
-          // }else if(Direction == 1){
+                 if(HighTime < 500){
+                   Direction =1;
+                }
+           }else if(Direction == 1){
 
-          //        HighTime += 100;
-          //        if(HighTime > 23000){
-          //         Direction =0;
-          //        }
+                  HighTime += 100;
+                 if(HighTime > 3000){
+                   Direction =0;
+                 }
 
 
-          // }
+          }
 
            TIM_SetCounter(TIM4, HighTime);
             TIM_Cmd(TIM4, ENABLE);

@@ -105,7 +105,7 @@ int main(void)
 
       if(PushButton_Read()){
 
-        LED3_on();
+        LED3_Toggle();
         Delay_1us(100000);
       }else{
 

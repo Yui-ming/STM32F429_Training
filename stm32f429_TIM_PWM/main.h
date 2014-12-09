@@ -6,12 +6,13 @@
  #include "stm32f4xx.h"
 
 #include "stm32f4xx_tim.h"
-
+uint8_t uart1_data;
 void RCC_Configuration(void);
 void GPIO_Configuration(void);
 void LED_Initialization(void);
 void LED3_Toggle(void);
 void PWM_Initialization(void);
+void USART1_Configuration(void);
 
 static inline void Delay_1us(uint32_t);
 
